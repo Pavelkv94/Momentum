@@ -184,6 +184,64 @@ function setFocus(e) {
   }
 }
 
+//TODO WEATHER
+const API_KEY = "3edd4a0c231e044b4555cb02b03a955d";
+const icon = document.querySelector(".weather-icon");
+const temperature = document.querySelector(".temperature");
+const humidity = document.querySelector(".weather-humidity");
+const wind = document.querySelector(".weather-wind");
+const city = document.querySelector(".city");
+
+async function getWeather() {
+  const apiUrl = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=en&appid=${API_KEY}&units=metric`
+  );
+  const data = await apiUrl.json();
+
+  if (data.cod === "404") {
+    city.textContent = localStorage.removeItem("cityLS");
+    city.textContent = "Incorrect Name";
+  } else {
+    icon.className = "weather-icon owf";
+    icon.classList.add(`owf-${data.weather[0].id}`);
+    temperature.textContent = `${data.main.temp.toFixed(0)}°C`;
+    humidity.textContent = `Humidity: ${data.main.humidity} %`;
+    wind.textContent = `Wind: ${data.wind.speed} km/h`;
+  }
+}
+
+function getCity() {
+  if (!localStorage.getItem("cityLS")) {
+    city.textContent = "Minsk";
+  } else {
+    city.textContent = localStorage.getItem("cityLS");
+  }
+}
+
+function setCity(event) {
+  if (event.type === "click") {
+    city.textContent = "";
+  }
+  if (event.type === "keypress") {
+    if (event.which === 13 || event.keyCode === 13) {
+      getWeather();
+      city.blur();
+    }
+  }
+  if (event.type === "blur") {
+    city.textContent = city.textContent.trim();
+    if (city.textContent === "") {
+      city.textContent = localStorage.getItem("cityLS");
+      if (city.textContent === "") {
+        city.textContent = "Minsk";
+      }
+    } else {
+      localStorage.setItem("cityLS", city.textContent);
+      getWeather();
+    }
+  }
+}
+
 
 
 
